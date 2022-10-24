@@ -119,14 +119,14 @@ class Converter(object):
             'description': 'Export your brush labels as PNG images. Each label outputs as one image.',
             'link': 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG',
             'tags': ['image segmentation']
-        },
-        Format.ASR_MANIFEST: {
+        }
+        """Format.ASR_MANIFEST: {
             'title': 'ASR Manifest',
             'description': 'Export audio transcription labels for automatic speech recognition as the JSON manifest '
                            'format expected by NVIDIA NeMo models.',
             'link': 'https://labelstud.io/guide/export.html#ASR-MANIFEST',
             'tags': ['speech recognition']
-        }
+        }"""
     }
 
     def all_formats(self):
