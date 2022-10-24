@@ -61,7 +61,7 @@ class Converter(object):
         Format.JSON: {
             'title': 'JSON',
             'description': "List of items in raw JSON format stored in one JSON file. Use to export both the data "
-                           "and the annotations for a dataset. It's Label Studio Common Format",
+                           "and the annotations for a dataset. It's Beewant Labeling Common Format",
             'link': 'https://labelstud.io/guide/export.html#JSON'
         },
         Format.JSON_MIN: {
@@ -570,7 +570,7 @@ class Converter(object):
                     'year': datetime.now().year,
                     'version': '1.0',
                     'description': '',
-                    'contributor': 'Label Studio',
+                    'contributor': 'Beewant Labeling',
                     'url': '',
                     'date_created': str(datetime.now())
                 }
@@ -672,7 +672,7 @@ class Converter(object):
                 'info': {
                     'year': datetime.now().year,
                     'version': '1.0',
-                    'contributor': 'Label Studio'
+                    'contributor': 'Beewant Labeling'
                 }
             }, fout, indent=2)
 
@@ -803,7 +803,7 @@ class Converter(object):
 
             owner_node = doc.createElement('owner')
             create_child_node(doc, 'flickrid', 'NULL', owner_node)
-            create_child_node(doc, 'name', 'Label Studio', owner_node)
+            create_child_node(doc, 'name', 'Beewant Labeling', owner_node)
             root_node.appendChild(owner_node)
             size_node = doc.createElement('size')
             create_child_node(doc, 'width', str(width), size_node)
