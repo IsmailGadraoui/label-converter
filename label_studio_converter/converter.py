@@ -6,6 +6,10 @@ import logging
 import pandas as pd
 import xml.dom
 import xml.dom.minidom
+# import boto3
+# from botocore.exceptions import ClientError
+# from botocore.client import Config
+
 
 from shutil import copy2
 from enum import Enum
@@ -25,6 +29,8 @@ from label_studio_converter import brush
 from label_studio_converter.audio import convert_to_asr_json_manifest
 
 logger = logging.getLogger(__name__)
+
+
 
 
 class FormatNotSupportedError(NotImplementedError):
@@ -448,6 +454,7 @@ class Converter(object):
         images, categories, annotations = [], [], []
         categories, category_name_to_id = self._get_labels()
         data_key = self._data_keys[0]
+        print("----------------------------------------------------------------------->>> INPUT DATA :",input_data)
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
         for item_idx, item in enumerate(item_iterator):
             image_path = item['input'][data_key]
@@ -455,15 +462,17 @@ class Converter(object):
             width = None
             height = None
             # download all images of the dataset, including the ones without annotations
-            if not os.path.exists(image_path):
-                try:
-                    image_path = download(image_path, output_image_dir, project_dir=self.project_dir,
-                                          return_relative_path=True, upload_dir=self.upload_dir,
-                                          download_resources=self.download_resources)
-                except:
-                    logger.info('Unable to download {image_path}. The image of {item} will be skipped'.format(
-                        image_path=image_path, item=item
-                    ), exc_info=True)
+            # if not os.path.exists(image_path):
+            try:
+                print("URL : ",image_path)
+                # image_path = generate_presigned_url(key=str(image_path))
+                image_path = download(image_path, output_image_dir, project_dir=self.project_dir,
+                                        return_relative_path=True, upload_dir=self.upload_dir,
+                                        download_resources=self.download_resources)
+            except:
+                logger.info('Unable to download {image_path}. The image of {item} will be skipped'.format(
+                    image_path=image_path, item=item
+                ), exc_info=True)
             # add image to final images list
             try:
                 with Image.open(os.path.join(output_dir, image_path)) as img:
@@ -473,7 +482,6 @@ class Converter(object):
                 logger.info("Unable to open {image_path}, can't extract width and height for COCO export".format(
                     image_path=image_path, item=item
                 ), exc_info=True)
-
             # skip tasks without annotations
             if not item['output']:
                 # image wasn't load and there are no labels
@@ -863,3 +871,6 @@ class Converter(object):
             while idx in list(category_name_to_id.values()):
                 idx += 1
         return categories, category_name_to_id
+
+
+
