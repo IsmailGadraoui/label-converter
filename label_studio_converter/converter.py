@@ -971,12 +971,12 @@ class Converter(object):
         }
 
         # Define custom category labels
-        if args.classes is not None:
-            for category in args.classes:
-                coco_format["categories"].append({
-                    "id": len(coco_format["categories"]),
-                    "name": category
-                })
+        # if args.classes is not None:
+        #     for category in args.classes:
+        #         coco_format["categories"].append({
+        #             "id": len(coco_format["categories"]),
+        #             "name": category
+        #         })
 
         index_cnt = 0
 
