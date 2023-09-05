@@ -411,16 +411,16 @@ class Converter(object):
                 logger.warning('No annotations found for item #' + str(item_idx))
                 continue
 
-        # Create a JSON file for each task
-        task_output_file = os.path.join(output_dir, f'task_{item_idx}.json')
-        task_data = {
-            'images': images,
-            'categories': categories,
-            'annotations': annotations
-        }
+            # Create a JSON file for each task
+            task_output_file = os.path.join(output_dir, f'task_{item_idx}.json')
+            task_data = {
+                'images': images,
+                'categories': categories,
+                'annotations': annotations
+            }
 
-        with io.open(task_output_file, mode='w', encoding='utf8') as fout:
-            json.dump(task_data, fout, indent=2, ensure_ascii=False)
+            with io.open(task_output_file, mode='w', encoding='utf8') as fout:
+                json.dump(task_data, fout, indent=2, ensure_ascii=False)
 
 
 
