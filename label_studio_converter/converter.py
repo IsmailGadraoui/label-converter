@@ -50,7 +50,7 @@ class Format(Enum):
     BRUSH_TO_PNG = 10
     ASR_MANIFEST = 11
     YOLO = 12
-    BRUSH_TO_COCO = 13
+    MASK_TO_COCO = 13
 
     def __str__(self):
         return self.name
@@ -204,7 +204,7 @@ class Converter(object):
             convert_to_asr_json_manifest(
                 items, output_data, data_key=self._data_keys[0], project_dir=self.project_dir,
                 upload_dir=self.upload_dir, download_resources=self.download_resources)
-        elif format == Format.BRUSH_TO_COCO:
+        elif format == Format.MASK_TO_COCO:
             image_dir = kwargs.get('image_dir')
             self.convert_brush_to_coco(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
 
