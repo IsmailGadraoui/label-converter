@@ -136,8 +136,7 @@ class Converter(object):
         },
         Format.MASK_TO_COCO: {
             'title': 'MASK TO COCO',
-            'description': "Popular machine learning format used by the COCO dataset for image '
-                           'segmentation tasks with polygons and rectangles.",
+            'description': "Popular machine learning format used by the COCO dataset for image. segmentation tasks with polygons and rectangles.",
             'link': 'https://labelstud.io/guide/export.html#JSON'
         },
     }
