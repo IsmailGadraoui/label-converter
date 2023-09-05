@@ -50,6 +50,7 @@ class Format(Enum):
     BRUSH_TO_PNG = 10
     ASR_MANIFEST = 11
     YOLO = 12
+    BRUSH_TO_COCO = 13
 
     def __str__(self):
         return self.name
@@ -132,7 +133,13 @@ class Converter(object):
             'description': 'Export your brush labels as PNG images. Each label outputs as one image.',
             'link': 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG',
             'tags': ['image segmentation']
-        }
+        },
+        Format.MASK_TO_COCO: {
+            'title': 'MASK TO COCO',
+            'description': "Popular machine learning format used by the COCO dataset for image '
+                           'segmentation tasks with polygons and rectangles.",
+            'link': 'https://labelstud.io/guide/export.html#JSON'
+        },
     }
 
     def all_formats(self):
@@ -198,6 +205,9 @@ class Converter(object):
             convert_to_asr_json_manifest(
                 items, output_data, data_key=self._data_keys[0], project_dir=self.project_dir,
                 upload_dir=self.upload_dir, download_resources=self.download_resources)
+        elif format == Format.BRUSH_TO_COCO:
+            image_dir = kwargs.get('image_dir')
+            self.convert_brush_to_coco(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
 
     def _get_data_keys_and_output_tags(self, output_tags=None):
         data_keys = set()
@@ -417,6 +427,9 @@ class Converter(object):
             task_data = {
                 'format_version': 'v1.0',
                 'sample': images[item_idx],
+                'metadata': {
+                    'created_username': 
+                }
                 'categories': categories,
                 'annotations': annotations
             }
@@ -920,6 +933,10 @@ class Converter(object):
 
             with io.open(xml_filepath, mode='w', encoding='utf8') as fout:
                 doc.writexml(fout, addindent='' * 4, newl='\n', encoding='utf-8')
+
+    def convert_brush_to_coco(self, input_data, output_dir, output_image_dir=None, is_dir=True):
+        pass
+
 
     def _get_labels(self):
         labels = set()
