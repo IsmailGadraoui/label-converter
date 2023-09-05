@@ -384,8 +384,6 @@ class Converter(object):
             image_id = len(images)
             width = None
             height = None
-            # download all images of the dataset, including the ones without annotations
-            # if not os.path.exists(image_path):
             try:
                 # image_path = generate_presigned_url(key=str(image_path))
                 image_path = download(image_path, output_image_dir, project_dir=self.project_dir,
@@ -412,92 +410,17 @@ class Converter(object):
 
                 logger.warning('No annotations found for item #' + str(item_idx))
                 continue
-          
-            # concatenate results over all tag names
-            labels = []
-            for key in item['output']:
-                labels += item['output'][key]
+        records = []
+        
+        if is_dir:
+            for json_file in glob(os.path.join(input_data, '*.json')):
+                with io.open(json_file, encoding='utf8') as f:
+                    records.append(json.load(f))
+            with io.open(output_file, mode='w', encoding='utf8') as fout:
+                json.dump(records, fout, indent=2, ensure_ascii=False)
+        else:
+            copy2(input_data, output_file)
 
-            if len(labels) == 0:
-                logger.debug(f'Empty bboxes for {item["output"]}')
-                continue
-
-            for label in labels:
-
-                category_name = None
-                for key in ['rectanglelabels', 'polygonlabels', 'labels']:
-                    if key in label and len(label[key]) > 0:
-                        category_name = label[key][0]
-                        break
-
-                if category_name is None:
-                    logger.warning("Unknown label type or labels are empty")
-                    continue
-
-                if not height or not width:
-                    if 'original_width' not in label or 'original_height' not in label:
-                        logger.debug(f'original_width or original_height not found in {image_path}')
-                        continue
-
-                    width, height = label['original_width'], label['original_height']
-                    images = add_image(images, width, height, image_id, image_path)
-
-                category_id = category_name_to_id[category_name]
-
-                annotation_id = len(annotations)
-
-                if 'rectanglelabels' in label or 'labels' in label:
-                    x, y, w, h = self.rotated_rectangle(label)
-                    
-                    x = x * label["original_width"] / 100
-                    y = y * label["original_height"] / 100
-                    w = w * label["original_width"] / 100
-                    h = h * label["original_height"] / 100
-
-                    annotations.append({
-                        'id': annotation_id,
-                        'image_id': image_id,
-                        'category_id': category_id,
-                        'segmentation': [],
-                        'bbox': [x, y, w, h],
-                        'ignore': 0,
-                        'iscrowd': 0,
-                        'area': w * h,
-                    })
-                elif "polygonlabels" in label:
-                    points_abs = [(x / 100 * width, y / 100 * height) for x, y in label["points"]]
-                    x, y = zip(*points_abs)
-
-                    annotations.append({
-                        'id': annotation_id,
-                        'image_id': image_id,
-                        'category_id': category_id,
-                        'segmentation': [[coord for point in points_abs for coord in point]],
-                        'bbox': get_polygon_bounding_box(x, y),
-                        'ignore': 0,
-                        'iscrowd': 0,
-                        'area': get_polygon_area(x, y)
-                    })
-                else:
-                    raise ValueError("Unknown label type")
-
-                if os.getenv('LABEL_STUDIO_FORCE_ANNOTATOR_EXPORT'):
-                    annotations[-1].update({'annotator': _get_annotator(item)})
-
-        with io.open(output_file, mode='w', encoding='utf8') as fout:
-            json.dump({
-                'images': images,
-                'categories': categories,
-                'annotations': annotations,
-                'info': {
-                    'year': datetime.now().year,
-                    'version': '1.0',
-                    'description': '',
-                    'contributor': 'Beewant Labeling',
-                    'url': '',
-                    'date_created': str(datetime.now())
-                }
-            }, fout, indent=2)
 
 
     def convert_to_json(self, input_data, output_dir, is_dir=True):
