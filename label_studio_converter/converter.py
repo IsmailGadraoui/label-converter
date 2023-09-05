@@ -159,7 +159,6 @@ class Converter(object):
             self._schema = parse_config(config_string)
 
         self._data_keys, self._output_tags = self._get_data_keys_and_output_tags(output_tags)
-        print(self._get_supported_formats())
         self._supported_formats = self._get_supported_formats()
 
     def convert(self, input_data, output_data, format, is_dir=True, **kwargs):
@@ -249,17 +248,14 @@ class Converter(object):
                                                 'Rectangle' in output_tag_types and 'Labels' in output_tag_types or
                                                 'PolygonLabels' in output_tag_types and 'Labels' in output_tag_types):
 
-            # all_formats.remove(Format.COCO.name)
-            all_formats.remove(Format.BRUSH_TO_PNG.name)
+            all_formats.remove(Format.COCO.name)
         if not ('Image' in input_tag_types and ('BrushLabels' in output_tag_types or 'brushlabels' in output_tag_types or
                                                 'Brush' in output_tag_types and 'Labels' in output_tag_types)):
-            # all_formats.remove(Format.BRUSH_TO_NUMPY.name)
-            # all_formats.remove(Format.BRUSH_TO_PNG.name)
-            all_formats.remove(Format.COCO.name)
+            all_formats.remove(Format.BRUSH_TO_NUMPY.name)
+            all_formats.remove(Format.BRUSH_TO_PNG.name)
         if not (('Audio' in input_tag_types or 'AudioPlus' in input_tag_types) and 'TextArea' in output_tag_types):
             all_formats.remove(Format.ASR_MANIFEST.name)
 
-        print("---------------------------------------->>>", all_formats)
         return all_formats
 
     @property
@@ -393,6 +389,7 @@ class Converter(object):
         data_key = self._data_keys[0]
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
         for item_idx, item in enumerate(item_iterator):
+            print(item)
             image_path = item['input'][data_key]
             image_id = len(images)
             width = None
@@ -937,7 +934,127 @@ class Converter(object):
                 doc.writexml(fout, addindent='' * 4, newl='\n', encoding='utf-8')
 
     def convert_brush_to_coco(self, input_data, output_dir, output_image_dir=None, is_dir=True):
-        pass
+
+        def binary_mask_to_rle(binary_mask):
+            rle = {'counts': [], 'size': list(binary_mask.shape)}
+            counts = rle.get('counts')
+            for i, (value, elements) in enumerate(groupby(binary_mask.ravel(order='F'))):
+                if i == 0 and value == 1:
+                    counts.append(0)
+                counts.append(len(list(elements)))
+            return rle
+
+        def rle2mask(rle,height, width):
+            """Convert RLE to mask
+
+            :param rle: list of ints in RLE format
+            :param height: height of binary mask
+            :param width: width of binary mask
+            :return: binary mask
+            """
+            mask = decode_rle(rle)
+            mask = mask.reshape(-1,4)[:, 0]
+            if mask.max()==255:
+                mask=np.where(mask==255,1,0)
+
+            return mask.reshape((height, width))
+
+        # Read Label Studio formatted JSON file
+        contents = input_data
+
+
+        # Initialize COCO format dictionary
+        coco_format = {
+            "images": [],
+            "categories": [],
+            "annotations": []
+        }
+
+        # Define custom category labels
+        if args.classes is not None:
+            for category in args.classes:
+                coco_format["categories"].append({
+                    "id": len(coco_format["categories"]),
+                    "name": category
+                })
+
+        index_cnt = 0
+
+        # Iterate through each annotation
+        for index_annotation in tqdm(range(len(contents))):
+            result = contents[index_annotation]['annotations'][0]['was_cancelled']
+
+            if not result:
+                width_from_json = contents[index_annotation]["annotations"][0]["result"][0]["original_width"]
+                height_from_json = contents[index_annotation]["annotations"][0]["result"][0]["original_height"]
+
+                labels = contents[index_annotation]['annotations'][0]['result']
+
+                for i in range(len(labels)):
+                    if 'rle' in labels[i]['value'].keys():
+                        label_rel = labels[i]
+                    else:
+                        continue
+
+                    image_id = contents[index_annotation]["id"]
+                    image_json_name_ = contents[index_annotation]["data"]['image'].split('/')[-1]
+                    image_json_name = image_json_name_.split('-', 1)[1]
+
+                    try:
+                        category = label_rel['value']['brushlabels'][0]
+                    except:
+                        category = label_rel['value']['rectanglelabels'][0]
+
+                    rle = label_rel['value']['rle']
+                    mask = rle2mask(rle, height_from_json, width_from_json)
+                    rle = binary_mask_to_rle(mask)
+                    contours, hierarchy = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                    new_contours = []
+                    for contour in contours:
+                        new_contours.extend(list(contour))
+                    new_contours = np.array(new_contours)
+                    x, y, w, h = cv2.boundingRect(new_contours)
+                    bbox = [x, y, w, h]
+                    area = w * h
+
+                    # Add image information to COCO format
+                    coco_format["images"].append({
+                        "id": image_id,
+                        "file_name": image_json_name,
+                        "width": width_from_json,
+                        "height": height_from_json
+                    })
+
+                    # Check if the category is already in the categories variable; if not, add it
+                    if not any(d["name"] == category for d in coco_format["categories"]):
+                        coco_format["categories"].append({
+                            "id": len(coco_format["categories"]),
+                            "name": category
+                        })
+
+                    # Add annotation information to COCO format
+                    coco_format["annotations"].append({
+                        "id": index_cnt,
+                        "image_id": image_id,
+                        "category_id": [d["id"] for d in coco_format["categories"] if d["name"] == category][0],
+                        "segmentation": rle,
+                        "bbox": bbox,
+                        "area": area,
+                        'iscrowd': 0  # RLE format
+                    })
+
+                    index_cnt += 1
+
+                # image_from = os.path.join(image_path_from, image_json_name_)
+                # image_to = os.path.join(image_path_to, 'images', image_json_name)
+                # image_from = urllib.parse.unquote(image_from)
+                # shutil.copy2(os.path.expanduser(image_from), image_to)
+
+        classes_output = [d["name"] for d in coco_format["categories"]]
+        print(classes_output)
+
+        with open(os.path.join(output_dir, 'ann.json'), "w") as out_file:
+            json.dump(coco_format, out_file, ensure_ascii=False, indent=4)
 
 
     def _get_labels(self):
