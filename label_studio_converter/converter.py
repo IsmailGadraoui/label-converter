@@ -360,10 +360,10 @@ class Converter(object):
 
         def add_image(images, width, height, image_id, image_path):
             images.append({
-                'width': width,
-                'height': height,
                 'id': image_id,
-                'file_name': image_path
+                'image_path': image_path,
+                'height': height,
+                'width': width
             })
             return images
 
@@ -380,6 +380,7 @@ class Converter(object):
         data_key = self._data_keys[0]
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
         for item_idx, item in enumerate(item_iterator):
+            print(item_idx)
             image_path = item['input'][data_key]
             image_id = len(images)
             width = None
@@ -414,7 +415,8 @@ class Converter(object):
             # Create a JSON file for each task
             task_output_file = os.path.join(output_dir, f'task_{item_idx}.json')
             task_data = {
-                'images': images[item_idx],
+                'format_version': 'v1.0',
+                'sample': images[item_idx],
                 'categories': categories,
                 'annotations': annotations
             }
