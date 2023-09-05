@@ -427,9 +427,9 @@ class Converter(object):
             task_data = {
                 'format_version': 'v1.0',
                 'sample': images[item_idx],
-                'metadata': {
-                    'created_username': 
-                }
+                # 'metadata': {
+                #     'created_username': 
+                # }
                 'categories': categories,
                 'annotations': annotations
             }
