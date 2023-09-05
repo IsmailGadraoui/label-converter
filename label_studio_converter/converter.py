@@ -961,7 +961,7 @@ class Converter(object):
 
         # Read Label Studio formatted JSON file
         contents = input_data
-
+        print("CONTENTS ------------------------------------>>>:",contents)
 
         # Initialize COCO format dictionary
         coco_format = {
