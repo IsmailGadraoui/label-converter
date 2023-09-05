@@ -981,7 +981,7 @@ class Converter(object):
         index_cnt = 0
 
         # Iterate through each annotation
-        for index_annotation in tqdm(range(len(contents))):
+        for index_annotation in range(len(contents)):
             result = contents[index_annotation]['annotations'][0]['was_cancelled']
 
             if not result:
