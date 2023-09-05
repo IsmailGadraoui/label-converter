@@ -414,7 +414,7 @@ class Converter(object):
             # Create a JSON file for each task
             task_output_file = os.path.join(output_dir, f'task_{item_idx}.json')
             task_data = {
-                'images': images,
+                'images': images[item_idx],
                 'categories': categories,
                 'annotations': annotations
             }
