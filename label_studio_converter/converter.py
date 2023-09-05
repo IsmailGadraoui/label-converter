@@ -159,6 +159,7 @@ class Converter(object):
             self._schema = parse_config(config_string)
 
         self._data_keys, self._output_tags = self._get_data_keys_and_output_tags(output_tags)
+        print(self._get_supported_formats())
         self._supported_formats = self._get_supported_formats()
 
     def convert(self, input_data, output_data, format, is_dir=True, **kwargs):
@@ -390,7 +391,6 @@ class Converter(object):
         data_key = self._data_keys[0]
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
         for item_idx, item in enumerate(item_iterator):
-            print(item)
             image_path = item['input'][data_key]
             image_id = len(images)
             width = None
