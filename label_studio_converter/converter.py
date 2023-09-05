@@ -380,7 +380,7 @@ class Converter(object):
         data_key = self._data_keys[0]
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
         for item_idx, item in enumerate(item_iterator):
-            print(item_idx)
+            print(item)
             image_path = item['input'][data_key]
             image_id = len(images)
             width = None
