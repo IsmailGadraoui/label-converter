@@ -159,7 +159,10 @@ class Converter(object):
         if isinstance(format, str):
             format = Format.from_string(format)
 
-        if format == Format.JSON:
+        if format == Format.CUSTOM:
+            image_dir = kwargs.get('image_dir')
+            self.convert_to_custom(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
+        elif format == Format.JSON:
             self.convert_to_json(input_data, output_data, is_dir=is_dir)
         elif format == Format.JSON_MIN:
             self.convert_to_json_min(input_data, output_data, is_dir=is_dir)
@@ -351,6 +354,151 @@ class Converter(object):
             else:
                 out.append(j)
         return out[0] if tag_type in ('Choices', 'TextArea') and len(out) == 1 else out
+
+
+    def convert_to_custom(self, input_data, output_dir, output_image_dir=None, is_dir=True):
+
+        def add_image(images, width, height, image_id, image_path):
+            images.append({
+                'width': width,
+                'height': height,
+                'id': image_id,
+                'file_name': image_path
+            })
+            return images
+
+        self._check_format(Format.CUSTOM)
+        ensure_dir(output_dir)
+        output_file = os.path.join(output_dir, 'result.json')
+        if output_image_dir is not None:
+            ensure_dir(output_image_dir)
+        else:
+            output_image_dir = os.path.join(output_dir, 'images')
+            os.makedirs(output_image_dir, exist_ok=True)
+        images, categories, annotations = [], [], []
+        categories, category_name_to_id = self._get_labels()
+        data_key = self._data_keys[0]
+        item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
+        for item_idx, item in enumerate(item_iterator):
+            image_path = item['input'][data_key]
+            image_id = len(images)
+            width = None
+            height = None
+            # download all images of the dataset, including the ones without annotations
+            # if not os.path.exists(image_path):
+            try:
+                # image_path = generate_presigned_url(key=str(image_path))
+                image_path = download(image_path, output_image_dir, project_dir=self.project_dir,
+                                        return_relative_path=True, upload_dir=self.upload_dir,
+                                        download_resources=self.download_resources)
+            except:
+                logger.info('Unable to download {image_path}. The image of {item} will be skipped'.format(
+                    image_path=image_path, item=item
+                ), exc_info=True)
+            # add image to final images list
+            try:
+                with Image.open(os.path.join(output_dir, image_path)) as img:
+                    width, height = img.size
+                images = add_image(images, width, height, image_id, image_path)
+            except:
+                logger.info("Unable to open {image_path}, can't extract width and height for CUSTOM export".format(
+                    image_path=image_path, item=item
+                ), exc_info=True)
+            # skip tasks without annotations
+            if not item['output']:
+                # image wasn't load and there are no labels
+                if not width:
+                    images = add_image(images, width, height, image_id, image_path)
+
+                logger.warning('No annotations found for item #' + str(item_idx))
+                continue
+          
+            # concatenate results over all tag names
+            labels = []
+            for key in item['output']:
+                labels += item['output'][key]
+
+            if len(labels) == 0:
+                logger.debug(f'Empty bboxes for {item["output"]}')
+                continue
+
+            for label in labels:
+
+                category_name = None
+                for key in ['rectanglelabels', 'polygonlabels', 'labels']:
+                    if key in label and len(label[key]) > 0:
+                        category_name = label[key][0]
+                        break
+
+                if category_name is None:
+                    logger.warning("Unknown label type or labels are empty")
+                    continue
+
+                if not height or not width:
+                    if 'original_width' not in label or 'original_height' not in label:
+                        logger.debug(f'original_width or original_height not found in {image_path}')
+                        continue
+
+                    width, height = label['original_width'], label['original_height']
+                    images = add_image(images, width, height, image_id, image_path)
+
+                category_id = category_name_to_id[category_name]
+
+                annotation_id = len(annotations)
+
+                if 'rectanglelabels' in label or 'labels' in label:
+                    x, y, w, h = self.rotated_rectangle(label)
+                    
+                    x = x * label["original_width"] / 100
+                    y = y * label["original_height"] / 100
+                    w = w * label["original_width"] / 100
+                    h = h * label["original_height"] / 100
+
+                    annotations.append({
+                        'id': annotation_id,
+                        'image_id': image_id,
+                        'category_id': category_id,
+                        'segmentation': [],
+                        'bbox': [x, y, w, h],
+                        'ignore': 0,
+                        'iscrowd': 0,
+                        'area': w * h,
+                    })
+                elif "polygonlabels" in label:
+                    points_abs = [(x / 100 * width, y / 100 * height) for x, y in label["points"]]
+                    x, y = zip(*points_abs)
+
+                    annotations.append({
+                        'id': annotation_id,
+                        'image_id': image_id,
+                        'category_id': category_id,
+                        'segmentation': [[coord for point in points_abs for coord in point]],
+                        'bbox': get_polygon_bounding_box(x, y),
+                        'ignore': 0,
+                        'iscrowd': 0,
+                        'area': get_polygon_area(x, y)
+                    })
+                else:
+                    raise ValueError("Unknown label type")
+
+                if os.getenv('LABEL_STUDIO_FORCE_ANNOTATOR_EXPORT'):
+                    annotations[-1].update({'annotator': _get_annotator(item)})
+
+        with io.open(output_file, mode='w', encoding='utf8') as fout:
+            json.dump({
+                'images': images,
+                'categories': categories,
+                'annotations': annotations,
+                'info': {
+                    'year': datetime.now().year,
+                    'version': '1.0',
+                    'description': '',
+                    'contributor': 'Beewant Labeling',
+                    'url': '',
+                    'date_created': str(datetime.now())
+                }
+            }, fout, indent=2)
+
 
     def convert_to_json(self, input_data, output_dir, is_dir=True):
         self._check_format(Format.JSON)
