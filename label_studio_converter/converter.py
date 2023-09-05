@@ -249,16 +249,17 @@ class Converter(object):
                                                 'Rectangle' in output_tag_types and 'Labels' in output_tag_types or
                                                 'PolygonLabels' in output_tag_types and 'Labels' in output_tag_types):
 
-            all_formats.remove(Format.COCO.name)
+            # all_formats.remove(Format.COCO.name)
+            all_formats.remove(Format.BRUSH_TO_PNG.name)
         if not ('Image' in input_tag_types and ('BrushLabels' in output_tag_types or 'brushlabels' in output_tag_types or
                                                 'Brush' in output_tag_types and 'Labels' in output_tag_types)):
-            print("---------------------------------------->>>", input_tag_types, output_tag_types)
             # all_formats.remove(Format.BRUSH_TO_NUMPY.name)
             # all_formats.remove(Format.BRUSH_TO_PNG.name)
             all_formats.remove(Format.COCO.name)
         if not (('Audio' in input_tag_types or 'AudioPlus' in input_tag_types) and 'TextArea' in output_tag_types):
             all_formats.remove(Format.ASR_MANIFEST.name)
 
+        print("---------------------------------------->>>", all_formats)
         return all_formats
 
     @property
