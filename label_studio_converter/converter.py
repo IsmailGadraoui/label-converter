@@ -962,10 +962,21 @@ class Converter(object):
 
         # Read Label Studio formatted JSON file
         records = []
-        contents = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
-        for json_file in glob(os.path.join(input_data, '*.json')):
-            with io.open(json_file, encoding='utf8') as f:
-                records.append(json.load(f))
+        item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
+        for item in item_iterator(input_data):
+            record = deepcopy(item['input'])
+            if item.get('id') is not None:
+                record['id'] = item['id']
+            for name, value in item['output'].items():
+                record[name] = self._prettify(value)
+            record['annotator'] = _get_annotator(item, int_id=True)
+            record['annotation_id'] = item['annotation_id']
+            record['created_at'] = item['created_at']
+            record['updated_at'] = item['updated_at']
+            record['lead_time'] = item['lead_time']
+            if 'agreement' in item:
+                record['agreement'] = item['agreement']
+            records.append(record)
         print("---------------------------------------------------------------->> Records : ",records)
 
         # Initialize COCO format dictionary
