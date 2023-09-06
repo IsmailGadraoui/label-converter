@@ -964,17 +964,10 @@ class Converter(object):
         self._check_format(Format.MASK_TO_COCO)
         ensure_dir(output_dir)
         output_file = os.path.join(output_dir, 'result.json')
-        records = []
-        if is_dir:
-            print("---------------------------------------------------------------->> Records NO: ",records)
-            for json_file in glob(os.path.join(input_data, '*.json')):
-                with io.open(json_file, encoding='utf8') as f:
-                    records.append(json.load(f))
-            with io.open(output_file, mode='w', encoding='utf8') as fout:
-                json.dump(records, fout, indent=2, ensure_ascii=False)
-        else:
-            print("---------------------------------------------------------------->> Records : ",records)
-            copy2(input_data, output_file)
+        json_file_path = input_data
+        with open(json_file_path, 'r') as file:
+            contents = json.loads(file.read())
+
 
         # Initialize COCO format dictionary
         coco_format = {
