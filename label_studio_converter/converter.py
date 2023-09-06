@@ -7,6 +7,7 @@ import pandas as pd
 import xml.dom
 import xml.dom.minidom
 import numpy as np
+import cv2
 from itertools import groupby
 
 # import boto3
