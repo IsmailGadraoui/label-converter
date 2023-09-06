@@ -27,6 +27,7 @@ from label_studio_converter.utils import (
 )
 from label_studio_converter import brush
 from label_studio_converter.audio import convert_to_asr_json_manifest
+from label_studio_converter.brush import decode_rle
 
 logger = logging.getLogger(__name__)
 
