@@ -206,6 +206,7 @@ class Converter(object):
                 upload_dir=self.upload_dir, download_resources=self.download_resources)
         elif format == Format.MASK_TO_COCO:
             items = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
+            image_dir = kwargs.get('image_dir')
             self.convert_brush_to_coco(items, output_data, output_image_dir=image_dir, is_dir=is_dir)
 
     def _get_data_keys_and_output_tags(self, output_tags=None):
