@@ -6,6 +6,8 @@ import logging
 import pandas as pd
 import xml.dom
 import xml.dom.minidom
+import numpy as np
+
 # import boto3
 # from botocore.exceptions import ClientError
 # from botocore.client import Config
