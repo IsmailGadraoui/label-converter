@@ -961,9 +961,12 @@ class Converter(object):
             return mask.reshape((height, width))
 
         # Read Label Studio formatted JSON file
+        records = []
         contents = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
-        for item_idx, item in enumerate(contents):
-            print(item)
+        for json_file in glob(os.path.join(input_data, '*.json')):
+            with io.open(json_file, encoding='utf8') as f:
+                records.append(json.load(f))
+        print("---------------------------------------------------------------->> Records : ",records)
 
         # Initialize COCO format dictionary
         coco_format = {
