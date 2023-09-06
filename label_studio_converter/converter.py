@@ -966,7 +966,7 @@ class Converter(object):
         output_file = os.path.join(output_dir, 'result.json')
         records = []
         if is_dir:
-            print("---------------------------------------------------------------->> Records : ", No records)
+            print("---------------------------------------------------------------->> Records NO: ",records)
             for json_file in glob(os.path.join(input_data, '*.json')):
                 with io.open(json_file, encoding='utf8') as f:
                     records.append(json.load(f))
