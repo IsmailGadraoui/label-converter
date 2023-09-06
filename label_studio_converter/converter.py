@@ -962,7 +962,8 @@ class Converter(object):
 
         # Read Label Studio formatted JSON file
         contents = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
-        print("CONTENTS ------------------------------------>>>:",contents)
+        for item_idx, item in enumerate(contents):
+            print(item)
 
         # Initialize COCO format dictionary
         coco_format = {
