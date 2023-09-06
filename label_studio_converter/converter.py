@@ -965,22 +965,16 @@ class Converter(object):
         ensure_dir(output_dir)
         output_file = os.path.join(output_dir, 'result.json')
         records = []
-        item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
-        for item in item_iterator:
-            record = deepcopy(item['input'])
-            if item.get('id') is not None:
-                record['id'] = item['id']
-            for name, value in item['output'].items():
-                record[name] = self._prettify(value)
-            record['annotator'] = _get_annotator(item, int_id=True)
-            record['annotation_id'] = item['annotation_id']
-            record['created_at'] = item['created_at']
-            record['updated_at'] = item['updated_at']
-            record['lead_time'] = item['lead_time']
-            if 'agreement' in item:
-                record['agreement'] = item['agreement']
-            records.append(record)
-        print("---------------------------------------------------------------->> Records : ",records)
+        if is_dir:
+            print("---------------------------------------------------------------->> Records : ", No records)
+            for json_file in glob(os.path.join(input_data, '*.json')):
+                with io.open(json_file, encoding='utf8') as f:
+                    records.append(json.load(f))
+            with io.open(output_file, mode='w', encoding='utf8') as fout:
+                json.dump(records, fout, indent=2, ensure_ascii=False)
+        else:
+            print("---------------------------------------------------------------->> Records : ",records)
+            copy2(input_data, output_file)
 
         # Initialize COCO format dictionary
         coco_format = {
