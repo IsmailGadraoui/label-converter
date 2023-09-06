@@ -961,6 +961,9 @@ class Converter(object):
             return mask.reshape((height, width))
 
         # Read Label Studio formatted JSON file
+        self._check_format(Format.MASK_TO_COCO)
+        ensure_dir(output_dir)
+        output_file = os.path.join(output_dir, 'result.json')
         records = []
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
         for item in item_iterator(input_data):
