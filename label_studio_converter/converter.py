@@ -205,8 +205,8 @@ class Converter(object):
                 items, output_data, data_key=self._data_keys[0], project_dir=self.project_dir,
                 upload_dir=self.upload_dir, download_resources=self.download_resources)
         elif format == Format.MASK_TO_COCO:
-            image_dir = kwargs.get('image_dir')
-            self.convert_brush_to_coco(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
+            items = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
+            self.convert_brush_to_coco(items, output_data, output_image_dir=image_dir, is_dir=is_dir)
 
     def _get_data_keys_and_output_tags(self, output_tags=None):
         data_keys = set()
@@ -933,7 +933,7 @@ class Converter(object):
             with io.open(xml_filepath, mode='w', encoding='utf8') as fout:
                 doc.writexml(fout, addindent='' * 4, newl='\n', encoding='utf-8')
 
-    def convert_brush_to_coco(self, input_data, output_dir, output_image_dir=None, is_dir=True):
+    def convert_brush_to_coco(self, items, output_dir, output_image_dir=None, is_dir=True):
 
         def binary_mask_to_rle(binary_mask):
             rle = {'counts': [], 'size': list(binary_mask.shape)}
@@ -960,8 +960,8 @@ class Converter(object):
             return mask.reshape((height, width))
 
         # Read Label Studio formatted JSON file
-        contents = input_data
-        print("CONTENTS ------------------------------------>>>:",contents)
+        contents = items
+        print("CONTENTS ------------------------------------>>>:",items)
 
         # Initialize COCO format dictionary
         coco_format = {
