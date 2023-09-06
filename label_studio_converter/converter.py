@@ -7,6 +7,7 @@ import pandas as pd
 import xml.dom
 import xml.dom.minidom
 import numpy as np
+from itertools import groupby
 
 # import boto3
 # from botocore.exceptions import ClientError
