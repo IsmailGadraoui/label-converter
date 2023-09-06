@@ -966,7 +966,7 @@ class Converter(object):
         output_file = os.path.join(output_dir, 'result.json')
         records = []
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
-        for item in item_iterator(input_data):
+        for item in item_iterator:
             record = deepcopy(item['input'])
             if item.get('id') is not None:
                 record['id'] = item['id']
