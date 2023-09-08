@@ -457,7 +457,8 @@ class Converter(object):
             with io.open(output_file, mode='w', encoding='utf8') as fout:
                 json.dump(records, fout, indent=2, ensure_ascii=False)
         else:
-            print("HELLO -w-------------------------->>",input_data)
+            with io.open(input_data, encoding='utf8') as f:
+                print("HELLO -w-------------------------->>",json.load(f))
             copy2(input_data, output_file)
 
     def convert_to_json_min(self, input_data, output_dir, is_dir=True):
