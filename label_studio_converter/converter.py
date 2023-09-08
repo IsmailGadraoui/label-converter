@@ -452,11 +452,12 @@ class Converter(object):
         if is_dir:
             for json_file in glob(os.path.join(input_data, '*.json')):
                 with io.open(json_file, encoding='utf8') as f:
-                    print(json.load(f))
+                    print("HELLO -w-------------------------->>")
                     records.append(json.load(f))
             with io.open(output_file, mode='w', encoding='utf8') as fout:
                 json.dump(records, fout, indent=2, ensure_ascii=False)
         else:
+            print("HELLO -w-------------------------->>",input_data)
             copy2(input_data, output_file)
 
     def convert_to_json_min(self, input_data, output_dir, is_dir=True):
