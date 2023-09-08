@@ -395,7 +395,6 @@ class Converter(object):
         data_key = self._data_keys[0]
         item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
         for item_idx, item in enumerate(item_iterator):
-            print(item)
             image_path = item['input'][data_key]
             image_id = len(images)
             width = None
@@ -453,6 +452,7 @@ class Converter(object):
         if is_dir:
             for json_file in glob(os.path.join(input_data, '*.json')):
                 with io.open(json_file, encoding='utf8') as f:
+                    print(json.load(f))
                     records.append(json.load(f))
             with io.open(output_file, mode='w', encoding='utf8') as fout:
                 json.dump(records, fout, indent=2, ensure_ascii=False)
@@ -1062,7 +1062,6 @@ class Converter(object):
                 # shutil.copy2(os.path.expanduser(image_from), image_to)
 
         classes_output = [d["name"] for d in coco_format["categories"]]
-        print(classes_output)
 
         with open(os.path.join(output_dir, 'ann.json'), "w") as out_file:
             json.dump(coco_format, out_file, ensure_ascii=False, indent=4)
