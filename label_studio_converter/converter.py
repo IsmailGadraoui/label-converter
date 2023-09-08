@@ -443,7 +443,8 @@ class Converter(object):
         with io.open(input_data, encoding='utf8') as f:
             data = json.load(f)
             for task in data:
-                task_output_file = os.path.join(output_dir, f'task_{task.id}.json')
+                task_id = task.get('id', 'unknown_id')
+                task_output_file = os.path.join(output_dir, f'task_{task_id}.json')
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
                     json.dump(task, fout, indent=2, ensure_ascii=False)
 
