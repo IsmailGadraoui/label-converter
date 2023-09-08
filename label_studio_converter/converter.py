@@ -459,7 +459,8 @@ class Converter(object):
         else:
             with io.open(input_data, encoding='utf8') as f:
                 data = json.load(f)
-                print("HELLO -w-------------------------->>",data[0])
+                for task in data:
+                    print("HELLO -w-------------------------->>",task)
             copy2(input_data, output_file)
 
     def convert_to_json_min(self, input_data, output_dir, is_dir=True):
