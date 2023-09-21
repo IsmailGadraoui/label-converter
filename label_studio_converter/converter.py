@@ -436,13 +436,14 @@ class Converter(object):
             #     # }
             #     'categories': categories,
             #     'annotations': annotations
-            # }
+            # } No nego
         with io.open(input_data, encoding='utf8') as f:
             data = json.load(f)
             for task in data:
                 task_id = task.get('id', 'unknown_id')
                 task_output_file = os.path.join(output_dir, f'task_{task_id}.json')
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
+                    print(self.transform_data(input_data))
                     json.dump(task, fout, indent=2, ensure_ascii=False)
 
     def convert_to_json(self, input_data, output_dir, is_dir=True):
@@ -1098,5 +1099,98 @@ class Converter(object):
                 idx += 1
         return categories, category_name_to_id
 
+
+    def transform_data(input_data):
+        
+        # Rest of the transformation code
+        target_data = {
+            "format_version": "v1.0",
+            "sample": {
+                "id": str(input_data["id"]),
+                "image_path": input_data["image_path"],
+                "height": input_data['result'][0]['original_height'],  # Use the extracted height
+                "width": input_data['result'][0]['original_width'],    # Use the extracted width
+            },
+            "metadata": {
+                "created_username": input_data["created_username"],
+            },
+            "system_meta": {
+                "is_deleted": input_data["task"]["is_deleted"],
+                "data_image": input_data["task"]["data"]["image"],
+            },
+            "tags": input_data["task"]["tags"],
+            "created_at": input_data["created_at"],
+            "updated_at": input_data["updated_at"],
+            "projects": {
+                str(input_data["task"]["project"]): {
+                    "name": "anomaly_detection",
+                    "system_meta": {
+                        "is_deleted": False,
+                        "task_id": input_data["task"]["id"],
+                        "is_labeled": input_data["task"]["is_labeled"],
+                        "overlap": input_data["task"]["overlap"],
+                        "inner_id": input_data["task"]["inner_id"],
+                        "updated_by": input_data["completed_by"]["id"],
+                        "file_upload": input_data["task"]["file_upload"],
+                    },
+                    "labels": [
+                        {
+                            "version": "v1.0",
+                            "system_meta": {
+                                "completed_by_id": input_data["completed_by"]["id"],
+                                "completed_by_first_name": input_data["completed_by"]["first_name"],
+                                "completed_by_last_name": input_data["completed_by"]["last_name"],
+                                "completed_by_email": input_data["completed_by"]["email"],
+                                "was_cancelled": input_data["was_cancelled"],
+                                "ground_truth": input_data["ground_truth"],
+                                "created_at": input_data["created_at"],
+                                "updated_at": input_data["updated_at"],
+                                "lead_time": input_data["lead_time"],
+                                "parent_prediction": input_data["parent_prediction"],
+                                "parent_annotation": input_data["parent_annotation"],
+                            },
+                            "annotations": {
+                                "instances": [],
+                            },
+                        }
+                    ],
+                }
+            },
+        }
+
+        for result_entry in input_data["result"]:
+            bbox = decode_rle(result_entry["value"]["rle"],result_entry['original_height'],result_entry['original_width'], False)
+            annotation = {
+                "id": result_entry["id"],
+                "kind": "RLE",
+                "rle": result_entry["value"]["rle"],
+                "label": {
+                    "id": "<MISSING>",
+                    "kind": "label",
+                    "value": result_entry["value"]["brushlabels"][0],
+                },
+                "image_height": result_entry['original_height'],  # Replace with actual height
+                "image_width": result_entry['original_width'],   # Replace with actual width
+                "metadata": {
+                    "type": result_entry["type"],
+                    "origin": result_entry["origin"],
+                    "from_name": result_entry["from_name"],
+                    "to_name": result_entry["to_name"],
+                    "image_rotation": result_entry["image_rotation"],
+                    "bounding_box": {
+                        "format": "tensorflow",
+                        "coordinates": {
+                            "y_min": bbox[1],  # Replace with actual values
+                            "x_min": bbox[0],  # Replace with actual values
+                            "y_max": bbox[3],  # Replace with actual values
+                            "x_max": bbox[2],  # Replace with actual values
+                        }
+                    }
+                }
+            }
+
+            target_data["projects"][str(input_data["task"]["project"])]["labels"][0]["annotations"]["instances"].append(annotation)
+
+        return target_data
 
 
