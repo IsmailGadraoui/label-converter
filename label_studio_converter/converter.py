@@ -132,6 +132,7 @@ class Converter(object):
         Format.MASK_TO_COCO: {
             'title': 'MASK TO COCO',
             'description': "Popular machine learning format used by the COCO dataset for image. segmentation tasks with polygons and rectangles.",
+            'tags': ['image segmentation']
         },
         Format.RESTRUCTED: {
             'title': 'RESTRUCTED DATA',
