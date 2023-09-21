@@ -1192,7 +1192,7 @@ class Converter(object):
                 }
             }
 
-            target_data["projects"][str(input_data["task"]["project"])]["labels"][0]["annotations"]["instances"].append(annotation)
+            target_data["projects"]["Test Project"]["labels"][0]["annotations"]["instances"].append(annotation)
 
         return target_data
 
