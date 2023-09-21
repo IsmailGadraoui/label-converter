@@ -1108,7 +1108,7 @@ class Converter(object):
             "format_version": "v1.0",
             "sample": {
                 "id": str(input_data["id"]),
-                "image_path": input_data["image_path"],
+                # "image_path": input_data["image_path"],
                 "height": input_data['result'][0]['original_height'],  # Use the extracted height
                 "width": input_data['result'][0]['original_width'],    # Use the extracted width
             },
@@ -1116,7 +1116,7 @@ class Converter(object):
                 "created_username": input_data["created_username"],
             },
             "system_meta": {
-                "is_deleted": input_data["task"]["is_deleted"],
+                # "is_deleted": input_data["task"]["is_deleted"],
                 "data_image": input_data["task"]["data"]["image"],
             },
             "tags": input_data["task"]["tags"],
