@@ -439,14 +439,12 @@ class Converter(object):
             # } No nego
         with io.open(input_data, encoding='utf8') as f:
             data = json.load(f)
-            print(" DATA ------------------------------->",data)
             for task in data:
-                print(" TASK ------------------------------->",task)
                 task_id = task.get('id', 'unknown_id')
                 task_output_file = os.path.join(output_dir, f'task_{task_id}.json')
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
-                    print(self.transform_data(task))
-                    json.dump(task, fout, indent=2, ensure_ascii=False)
+                    transformed = self.transform_data(task)
+                    json.dump(transformed, fout, indent=2, ensure_ascii=False)
 
     def convert_to_json(self, input_data, output_dir, is_dir=True):
         self._check_format(Format.JSON)
@@ -1161,7 +1159,10 @@ class Converter(object):
         }
 
         for result_entry in input_data["annotations"][0]["result"]:
-            bbox = decode_rle(result_entry["value"]["rle"],result_entry['original_height'],result_entry['original_width'], False)
+            out = decode_rle(result_entry["value"]["rle"])
+            decoded_bbox = np.reshape(out, [result_entry['original_height'], result_entry['original_width'], 4])[:, :, 3]
+            img = Image.fromarray(decoded_bbox)
+            bbox = img.getbbox()  # Get bounding box as (x_min, y_min, x_max, y_max)
             annotation = {
                 "id": result_entry["id"],
                 "kind": "RLE",
