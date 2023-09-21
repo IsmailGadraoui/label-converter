@@ -1160,7 +1160,7 @@ class Converter(object):
             },
         }
 
-        for result_entry in input_data["result"]:
+        for result_entry in input_data["annotations"][0]["result"]:
             bbox = decode_rle(result_entry["value"]["rle"],result_entry['original_height'],result_entry['original_width'], False)
             annotation = {
                 "id": result_entry["id"],
