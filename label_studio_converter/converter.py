@@ -134,8 +134,8 @@ class Converter(object):
             'description': "Popular machine learning format used by the COCO dataset for image. segmentation tasks with polygons and rectangles.",
         },
         Format.RESTRUCTED: {
-            'title': 'RECONSTRUCTED DATA',
-            'description': "Reconstructs beewant's default data and extracts bounding boxes",
+            'title': 'RESTRUCTED DATA',
+            'description': "Restructs beewant's default data and extracts bounding boxes",
             'tags': ['image segmentation']
         },
     }
@@ -207,9 +207,9 @@ class Converter(object):
             items = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
             image_dir = kwargs.get('image_dir')
             self.convert_brush_to_coco(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
-        elif format == Format.RECONSTRUCTED:
+        elif format == Format.RESTRUCTED:
             image_dir = kwargs.get('image_dir')
-            self.convert_to_reconstructed(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
+            self.convert_to_restructed(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
 
     def _get_data_keys_and_output_tags(self, output_tags=None):
         data_keys = set()
@@ -431,7 +431,7 @@ class Converter(object):
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
                     json.dump(task, fout, indent=2, ensure_ascii=False)
 
-    def convert_to_reconstructed(self, input_data, output_dir, output_image_dir=None, is_dir=True):
+    def convert_to_restructed(self, input_data, output_dir, output_image_dir=None, is_dir=True):
 
         def add_image(images, width, height, image_id, image_path):
             images.append({
@@ -442,7 +442,7 @@ class Converter(object):
             })
             return images
 
-        self._check_format(Format.RECONSTRUCTED)
+        self._check_format(Format.RESTRUCTED)
         ensure_dir(output_dir)
         output_file = os.path.join(output_dir, 'result.json')
         if output_image_dir is not None:
@@ -474,7 +474,7 @@ class Converter(object):
                     width, height = img.size
                 images = add_image(images, width, height, image_id, image_path)
             except:
-                logger.info("Unable to open {image_path}, can't extract width and height for RECONSTRUCTED export".format(
+                logger.info("Unable to open {image_path}, can't extract width and height for RESTRUCTED export".format(
                     image_path=image_path, item=item
                 ), exc_info=True)
             # skip tasks without annotations
