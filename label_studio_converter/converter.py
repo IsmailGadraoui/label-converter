@@ -1108,18 +1108,18 @@ class Converter(object):
             "format_version": "v1.0",
             "sample": {
                 "id": str(input_data["id"]),
-                # "image_path": input_data["image_path"],
-                "height": input_data['annotations'][0]['result'][0]['original_height'],  # Use the extracted height
-                "width": input_data['annotations'][0]['result'][0]['original_width'],    # Use the extracted width
+                "image_path": input_data["file_upload"], #Only if uploaded to change for cloud images
+                "height": input_data['annotations'][0]['result'][0]['original_height'],  
+                "width": input_data['annotations'][0]['result'][0]['original_width'], 
             },
             "metadata": {
-                "created_username": input_data["created_username"],
+                "created_username": input_data["updated_by"],
             },
             "system_meta": {
                 # "is_deleted": input_data["task"]["is_deleted"],
-                "data_image": input_data["task"]["data"]["image"],
+                "data_image": input_data["data"]["image"],
             },
-            "tags": input_data["task"]["tags"],
+            "tags": input_data["tags"],
             "created_at": input_data["created_at"],
             "updated_at": input_data["updated_at"],
             "projects": {
@@ -1127,28 +1127,28 @@ class Converter(object):
                     "name": "anomaly_detection",
                     "system_meta": {
                         "is_deleted": False,
-                        "task_id": input_data["task"]["id"],
-                        "is_labeled": input_data["task"]["is_labeled"],
-                        "overlap": input_data["task"]["overlap"],
-                        "inner_id": input_data["task"]["inner_id"],
-                        "updated_by": input_data["completed_by"]["id"],
-                        "file_upload": input_data["task"]["file_upload"],
+                        "task_id": input_data["id"],
+                        # "is_labeled": input_data["task"]["is_labeled"], -----> To Add
+                        # "overlap": input_data["task"]["overlap"], -----> To Add
+                        "inner_id": input_data["inner_id"],
+                        "updated_by": input_data["updated_by"],
+                        "file_upload": input_data["file_upload"],
                     },
                     "labels": [
                         {
                             "version": "v1.0",
                             "system_meta": {
-                                "completed_by_id": input_data["completed_by"]["id"],
-                                "completed_by_first_name": input_data["completed_by"]["first_name"],
-                                "completed_by_last_name": input_data["completed_by"]["last_name"],
-                                "completed_by_email": input_data["completed_by"]["email"],
-                                "was_cancelled": input_data["was_cancelled"],
-                                "ground_truth": input_data["ground_truth"],
+                                "completed_by_id": input_data["updated_by"], #---------> Completed By?
+                                # "completed_by_first_name": input_data["completed_by"]["first_name"], --------> To add
+                                # "completed_by_last_name": input_data["completed_by"]["last_name"], --------> To add
+                                # "completed_by_email": input_data["completed_by"]["email"], --------> To add
+                                "was_cancelled": input_data["annotations"][0]["was_cancelled"],
+                                "ground_truth": input_data["annotations"][0]["ground_truth"],
                                 "created_at": input_data["created_at"],
                                 "updated_at": input_data["updated_at"],
-                                "lead_time": input_data["lead_time"],
-                                "parent_prediction": input_data["parent_prediction"],
-                                "parent_annotation": input_data["parent_annotation"],
+                                "lead_time": input_data["annotations"][0]["lead_time"],
+                                "parent_prediction": input_data["annotations"][0]["parent_prediction"],
+                                "parent_annotation": input_data["annotations"][0]["parent_annotation"],
                             },
                             "annotations": {
                                 "instances": [],
