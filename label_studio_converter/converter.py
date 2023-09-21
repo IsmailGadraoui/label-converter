@@ -1124,7 +1124,7 @@ class Converter(object):
             "created_at": input_data["created_at"],
             "updated_at": input_data["updated_at"],
             "projects": {
-                str(input_data["task"]["project"]): {
+                "Test project"{    # str(input_data["task"]["project"]): { #--------------> To Add?
                     "name": "anomaly_detection",
                     "system_meta": {
                         "is_deleted": False,
