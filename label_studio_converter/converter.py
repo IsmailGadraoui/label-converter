@@ -439,9 +439,9 @@ class Converter(object):
             # } No nego
         with io.open(input_data, encoding='utf8') as f:
             data = json.load(f)
+            print(" DATA ------------------------------->",data)
             for task in data:
                 print(" TASK ------------------------------->",task)
-                print(" TASK ------------------------------->",data)
                 task_id = task.get('id', 'unknown_id')
                 task_output_file = os.path.join(output_dir, f'task_{task_id}.json')
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
