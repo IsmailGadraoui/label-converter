@@ -442,17 +442,8 @@ class Converter(object):
             for task in data:
                 task_id = task.get('id', 'unknown_id')
                 task_output_file = os.path.join(output_dir, f'task_{task_id}.json')
-                task_data = {
-                    'format_version': 'v1.0',
-                    'sample': images[item_idx],
-                    'metadata': {
-                        'created_username': 
-                    }
-                    'categories': categories,
-                    'annotations': annotations
-                }
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
-                    json.dump(task_data, fout, indent=2, ensure_ascii=False)
+                    json.dump(task, fout, indent=2, ensure_ascii=False)
 
     def convert_to_json(self, input_data, output_dir, is_dir=True):
         self._check_format(Format.JSON)
