@@ -56,6 +56,7 @@ class Format(Enum):
     ASR_MANIFEST = 11
     YOLO = 12
     MASK_TO_COCO = 13
+    RESTRUCTED = 14
 
     def __str__(self):
         return self.name
@@ -75,74 +76,67 @@ class Converter(object):
             'title': 'CUSTOM',
             'description': "List of items in raw JSON format stored in seperate JSON files. Use to export both the data "
                            "and the annotations for a dataset. It's Beewant Labeling Custom Format",
-            'link': 'https://labelstud.io/guide/export.html#JSON'
         },
         Format.JSON: {
             'title': 'JSON',
             'description': "List of items in raw JSON format stored in one JSON file. Use to export both the data "
                            "and the annotations for a dataset. It's Beewant Labeling Common Format",
-            'link': 'https://labelstud.io/guide/export.html#JSON'
         },
         Format.JSON_MIN: {
             'title': 'JSON-MIN',
             'description': 'List of items where only "from_name", "to_name" values from the raw JSON format are '
                            'exported. Use to export only the annotations for a dataset.',
-            'link': 'https://labelstud.io/guide/export.html#JSON-MIN',
         },
         Format.CSV: {
             'title': 'CSV',
             'description': 'Results are stored as comma-separated values with the column names specified by the '
                            'values of the "from_name" and "to_name" fields.',
-            'link': 'https://labelstud.io/guide/export.html#CSV'
         },
         Format.TSV: {
             'title': 'TSV',
             'description': 'Results are stored in tab-separated tabular file with column names specified by '
                            '"from_name" "to_name" values',
-            'link': 'https://labelstud.io/guide/export.html#TSV'
         },
         Format.CONLL2003: {
             'title': 'CONLL2003',
             'description': 'Popular format used for the CoNLL-2003 named entity recognition challenge.',
-            'link': 'https://labelstud.io/guide/export.html#CONLL2003',
             'tags': ['sequence labeling', 'text tagging', 'named entity recognition']
         },
         Format.COCO: {
             'title': 'COCO',
             'description': 'Popular machine learning format used by the COCO dataset for object detection and image '
                            'segmentation tasks with polygons and rectangles.',
-            'link': 'https://labelstud.io/guide/export.html#COCO',
             'tags': ['image segmentation', 'object detection']
         },
         Format.VOC: {
             'title': 'Pascal VOC XML',
             'description': 'Popular XML format used for object detection and polygon image segmentation tasks.',
-            'link': 'https://labelstud.io/guide/export.html#Pascal-VOC-XML',
             'tags': ['image segmentation', 'object detection']
         },
         Format.YOLO: {
             'title': 'YOLO',
             'description': 'Popular TXT format is created for each image file. Each txt file contains annotations for '
                            'the corresponding image file, that is object class, object coordinates, height & width.',
-            'link': 'https://labelstud.io/guide/export.html#YOLO',
             'tags': ['image segmentation', 'object detection']
         },
         Format.BRUSH_TO_NUMPY: {
             'title': 'Brush labels to NumPy',
             'description': 'Export your brush labels as NumPy 2d arrays. Each label outputs as one image.',
-            'link': 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG',
             'tags': ['image segmentation']
         },
         Format.BRUSH_TO_PNG: {
             'title': 'Brush labels to PNG',
             'description': 'Export your brush labels as PNG images. Each label outputs as one image.',
-            'link': 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG',
             'tags': ['image segmentation']
         },
         Format.MASK_TO_COCO: {
             'title': 'MASK TO COCO',
             'description': "Popular machine learning format used by the COCO dataset for image. segmentation tasks with polygons and rectangles.",
-            'link': 'https://labelstud.io/guide/export.html#JSON'
+        },
+        Format.RESTRUCTED: {
+            'title': 'RECONSTRUCTED DATA',
+            'description': "Reconstructs beewant's default data and extracts bounding boxes",
+            'tags': ['image segmentation']
         },
     }
 
@@ -213,6 +207,9 @@ class Converter(object):
             items = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
             image_dir = kwargs.get('image_dir')
             self.convert_brush_to_coco(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
+        elif format == Format.RECONSTRUCTED:
+            image_dir = kwargs.get('image_dir')
+            self.convert_to_reconstructed(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
 
     def _get_data_keys_and_output_tags(self, output_tags=None):
         data_keys = set()
@@ -426,17 +423,69 @@ class Converter(object):
                 logger.warning('No annotations found for item #' + str(item_idx))
                 continue
 
-            # Create a JSON file for each task
-            # task_output_file = os.path.join(output_dir, f'task_{item_idx}.json')
-            # task_data = {
-            #     'format_version': 'v1.0',
-            #     'sample': images[item_idx],
-            #     # 'metadata': {
-            #     #     'created_username': 
-            #     # }
-            #     'categories': categories,
-            #     'annotations': annotations
-            # } No nego
+        with io.open(input_data, encoding='utf8') as f:
+            data = json.load(f)
+            for task in data:
+                task_id = task.get('id', 'unknown_id')
+                task_output_file = os.path.join(output_dir, f'task_{task_id}.json')
+                with io.open(task_output_file, mode='w', encoding='utf8') as fout:
+                    json.dump(task, fout, indent=2, ensure_ascii=False)
+
+    def convert_to_reconstructed(self, input_data, output_dir, output_image_dir=None, is_dir=True):
+
+        def add_image(images, width, height, image_id, image_path):
+            images.append({
+                'id': image_id,
+                'image_path': image_path,
+                'height': height,
+                'width': width
+            })
+            return images
+
+        self._check_format(Format.RECONSTRUCTED)
+        ensure_dir(output_dir)
+        output_file = os.path.join(output_dir, 'result.json')
+        if output_image_dir is not None:
+            ensure_dir(output_image_dir)
+        else:
+            output_image_dir = os.path.join(output_dir, 'images')
+            os.makedirs(output_image_dir, exist_ok=True)
+        images, categories, annotations = [], [], []
+        categories, category_name_to_id = self._get_labels()
+        data_key = self._data_keys[0]
+        item_iterator = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
+        for item_idx, item in enumerate(item_iterator):
+            image_path = item['input'][data_key]
+            image_id = len(images)
+            width = None
+            height = None
+            try:
+                # image_path = generate_presigned_url(key=str(image_path))
+                image_path = download(image_path, output_image_dir, project_dir=self.project_dir,
+                                        return_relative_path=True, upload_dir=self.upload_dir,
+                                        download_resources=self.download_resources)
+            except:
+                logger.info('Unable to download {image_path}. The image of {item} will be skipped'.format(
+                    image_path=image_path, item=item
+                ), exc_info=True)
+            # add image to final images list
+            try:
+                with Image.open(os.path.join(output_dir, image_path)) as img:
+                    width, height = img.size
+                images = add_image(images, width, height, image_id, image_path)
+            except:
+                logger.info("Unable to open {image_path}, can't extract width and height for RECONSTRUCTED export".format(
+                    image_path=image_path, item=item
+                ), exc_info=True)
+            # skip tasks without annotations
+            if not item['output']:
+                # image wasn't load and there are no labels
+                if not width:
+                    images = add_image(images, width, height, image_id, image_path)
+
+                logger.warning('No annotations found for item #' + str(item_idx))
+                continue
+
         with io.open(input_data, encoding='utf8') as f:
             data = json.load(f)
             for task in data:
@@ -445,6 +494,7 @@ class Converter(object):
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
                     transformed = self.transform_data(task)
                     json.dump(transformed, fout, indent=2, ensure_ascii=False)
+
 
     def convert_to_json(self, input_data, output_dir, is_dir=True):
         self._check_format(Format.JSON)
