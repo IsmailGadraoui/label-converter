@@ -443,7 +443,7 @@ class Converter(object):
                 task_id = task.get('id', 'unknown_id')
                 task_output_file = os.path.join(output_dir, f'task_{task_id}.json')
                 with io.open(task_output_file, mode='w', encoding='utf8') as fout:
-                    print(self.transform_data(input_data))
+                    print(self.transform_data(task))
                     json.dump(task, fout, indent=2, ensure_ascii=False)
 
     def convert_to_json(self, input_data, output_dir, is_dir=True):
