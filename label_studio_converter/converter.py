@@ -1109,8 +1109,8 @@ class Converter(object):
             "sample": {
                 "id": str(input_data["id"]),
                 # "image_path": input_data["image_path"],
-                "height": input_data['result'][0]['original_height'],  # Use the extracted height
-                "width": input_data['result'][0]['original_width'],    # Use the extracted width
+                "height": input_data['annotations']['result'][0]['original_height'],  # Use the extracted height
+                "width": input_data['annotations']['result'][0]['original_width'],    # Use the extracted width
             },
             "metadata": {
                 "created_username": input_data["created_username"],
