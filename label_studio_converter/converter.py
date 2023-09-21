@@ -1102,7 +1102,7 @@ class Converter(object):
 
     def transform_data(self,input_data):
 
-        print("INPUT DATA : ",input_data[0])
+        print("INPUT DATA : ",input_data)
         # Rest of the transformation code
         target_data = {
             "format_version": "v1.0",
