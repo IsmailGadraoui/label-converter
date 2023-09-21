@@ -256,6 +256,8 @@ class Converter(object):
                                                 'Brush' in output_tag_types and 'Labels' in output_tag_types)):
             all_formats.remove(Format.BRUSH_TO_NUMPY.name)
             all_formats.remove(Format.BRUSH_TO_PNG.name)
+             all_formats.remove(Format.RESTRUCTED.name)
+              all_formats.remove(Format.MASK_TO_COCO.name)
         if not (('Audio' in input_tag_types or 'AudioPlus' in input_tag_types) and 'TextArea' in output_tag_types):
             all_formats.remove(Format.ASR_MANIFEST.name)
 
