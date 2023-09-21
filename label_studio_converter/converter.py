@@ -1100,7 +1100,7 @@ class Converter(object):
         return categories, category_name_to_id
 
 
-    def transform_data(input_data):
+    def transform_data(self,input_data):
         
         # Rest of the transformation code
         target_data = {
