@@ -43,7 +43,6 @@ class FormatNotSupportedError(NotImplementedError):
 
 
 class Format(Enum):
-    CUSTOM = 1
     JSON = 2
     JSON_MIN = 3
     CSV = 4
@@ -55,7 +54,6 @@ class Format(Enum):
     BRUSH_TO_PNG = 10
     ASR_MANIFEST = 11
     YOLO = 12
-    MASK_TO_COCO = 13
 
     def __str__(self):
         return self.name
