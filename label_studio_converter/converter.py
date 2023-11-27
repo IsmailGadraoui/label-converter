@@ -157,10 +157,7 @@ class Converter(object):
         if isinstance(format, str):
             format = Format.from_string(format)
 
-        if format == Format.CUSTOM:
-            image_dir = kwargs.get('image_dir')
-            self.convert_to_custom(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
-        elif format == Format.JSON:
+        if format == Format.JSON:
             self.convert_to_json(input_data, output_data, is_dir=is_dir)
         elif format == Format.JSON_MIN:
             self.convert_to_json_min(input_data, output_data, is_dir=is_dir)
@@ -196,10 +193,6 @@ class Converter(object):
             convert_to_asr_json_manifest(
                 items, output_data, data_key=self._data_keys[0], project_dir=self.project_dir,
                 upload_dir=self.upload_dir, download_resources=self.download_resources)
-        elif format == Format.MASK_TO_COCO:
-            items = self.iter_from_dir(input_data) if is_dir else self.iter_from_json_file(input_data)
-            image_dir = kwargs.get('image_dir')
-            self.convert_brush_to_coco(input_data, output_data, output_image_dir=image_dir, is_dir=is_dir)
 
     def _get_data_keys_and_output_tags(self, output_tags=None):
         data_keys = set()
