@@ -43,17 +43,17 @@ class FormatNotSupportedError(NotImplementedError):
 
 
 class Format(Enum):
-    JSON = 2
-    JSON_MIN = 3
-    CSV = 4
-    TSV = 5
-    CONLL2003 = 6
-    COCO = 7
-    VOC = 8
-    BRUSH_TO_NUMPY = 9
-    BRUSH_TO_PNG = 10
-    ASR_MANIFEST = 11
-    YOLO = 12
+    JSON = 1
+    JSON_MIN = 2
+    CSV = 3
+    TSV = 4
+    CONLL2003 = 5
+    COCO = 6
+    VOC = 7
+    BRUSH_TO_NUMPY = 8
+    BRUSH_TO_PNG = 9
+    ASR_MANIFEST = 10
+    YOLO = 11
 
     def __str__(self):
         return self.name
@@ -69,12 +69,6 @@ class Format(Enum):
 class Converter(object):
 
     _FORMAT_INFO = {
-        Format.CUSTOM: {
-            'title': 'CUSTOM',
-            'description': "List of items in raw JSON format stored in seperate JSON files. Use to export both the data "
-                           "and the annotations for a dataset. It's Beewant Labeling Custom Format",
-            'link': 'https://labelstud.io/guide/export.html#JSON'
-        },
         Format.JSON: {
             'title': 'JSON',
             'description': "List of items in raw JSON format stored in one JSON file. Use to export both the data "
@@ -136,11 +130,6 @@ class Converter(object):
             'description': 'Export your brush labels as PNG images. Each label outputs as one image.',
             'link': 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG',
             'tags': ['image segmentation']
-        },
-        Format.MASK_TO_COCO: {
-            'title': 'MASK TO COCO',
-            'description': "Popular machine learning format used by the COCO dataset for image. segmentation tasks with polygons and rectangles.",
-            'link': 'https://labelstud.io/guide/export.html#JSON'
         },
     }
 
