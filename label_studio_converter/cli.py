@@ -12,7 +12,7 @@ class ExpandFullPath(argparse.Action):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Converter from Label Studio output completions to various formats',
+        description='Converter from Beewant output completions to various formats',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
@@ -56,11 +56,11 @@ def main():
     )
     parser.add_argument(
         '--project-dir', dest='project_dir', default=None,
-        help='Label Studio project directory path'
+        help='Beewant project directory path'
     )
     parser.add_argument(
         '--heartex-format', dest='heartex_format', action='store_true',
-        help='Set this flag if your completions are coming from Heartex platform instead of Label Studio'
+        help='Set this flag if your completions are coming from Heartex platform instead of Beewant'
     )
     args = parser.parse_args()
 

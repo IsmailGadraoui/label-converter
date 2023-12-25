@@ -1,4 +1,4 @@
-""" This code allows to export Label Studio Export JSON to FUNSD format. 
+""" This code allows to export Beewant Export JSON to FUNSD format. 
 It's only the basic converter, it converts every bbox as a separate word. 
 
 Usage: funsd.py export.json 

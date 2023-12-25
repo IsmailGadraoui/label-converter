@@ -383,7 +383,7 @@ def image2annotation(path, label_name, from_name, to_name, ground_truth=False, m
     :param model_version: any string, only for predictions
     :param score: model score as float, only for predictions
     
-    :return: dict with Label Studio Annotation or Prediction (Pre-annotation)
+    :return: dict with Beewant Annotation or Prediction (Pre-annotation)
     """
     rle, width, height = image2rle(path)
     result = {

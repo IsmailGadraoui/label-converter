@@ -73,37 +73,31 @@ class Converter(object):
             'title': 'JSON',
             'description': "List of items in raw JSON format stored in one JSON file. Use to export both the data "
                            "and the annotations for a dataset. It's Beewant Labeling Common Format",
-            'link': 'https://labelstud.io/guide/export.html#JSON'
         },
         Format.JSON_MIN: {
             'title': 'JSON-MIN',
             'description': 'List of items where only "from_name", "to_name" values from the raw JSON format are '
                            'exported. Use to export only the annotations for a dataset.',
-            'link': 'https://labelstud.io/guide/export.html#JSON-MIN',
         },
         Format.CSV: {
             'title': 'CSV',
             'description': 'Results are stored as comma-separated values with the column names specified by the '
                            'values of the "from_name" and "to_name" fields.',
-            'link': 'https://labelstud.io/guide/export.html#CSV'
         },
         Format.TSV: {
             'title': 'TSV',
             'description': 'Results are stored in tab-separated tabular file with column names specified by '
                            '"from_name" "to_name" values',
-            'link': 'https://labelstud.io/guide/export.html#TSV'
         },
         Format.CONLL2003: {
             'title': 'CONLL2003',
             'description': 'Popular format used for the CoNLL-2003 named entity recognition challenge.',
-            'link': 'https://labelstud.io/guide/export.html#CONLL2003',
             'tags': ['sequence labeling', 'text tagging', 'named entity recognition']
         },
         Format.COCO: {
             'title': 'COCO',
             'description': 'Popular machine learning format used by the COCO dataset for object detection and image '
                            'segmentation tasks with polygons and rectangles.',
-            'link': 'https://labelstud.io/guide/export.html#COCO',
             'tags': ['image segmentation', 'object detection']
         },
         Format.VOC: {
@@ -116,19 +110,16 @@ class Converter(object):
             'title': 'YOLO',
             'description': 'Popular TXT format is created for each image file. Each txt file contains annotations for '
                            'the corresponding image file, that is object class, object coordinates, height & width.',
-            'link': 'https://labelstud.io/guide/export.html#YOLO',
             'tags': ['image segmentation', 'object detection']
         },
         Format.BRUSH_TO_NUMPY: {
             'title': 'Brush labels to NumPy',
             'description': 'Export your brush labels as NumPy 2d arrays. Each label outputs as one image.',
-            'link': 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG',
             'tags': ['image segmentation']
         },
         Format.BRUSH_TO_PNG: {
             'title': 'Brush labels to PNG',
             'description': 'Export your brush labels as PNG images. Each label outputs as one image.',
-            'link': 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG',
             'tags': ['image segmentation']
         },
     }
@@ -770,11 +761,11 @@ class Converter(object):
         
         if abs(label_r) > 0:
             alpha = math.atan(label_h / label_w)
-            beta = math.pi * (label_r / 180)  # Label studio defines the angle towards the vertical axis
+            beta = math.pi * (label_r / 180)  # Beewant defines the angle towards the vertical axis
             
             radius = math.sqrt((label_w/2) ** 2 + (label_h/2) ** 2)
             
-            # Label studio saves the position of top left corner after rotation
+            # Beewant saves the position of top left corner after rotation
             x_0 = label_x - radius * (math.cos(math.pi - alpha - beta) - math.cos(math.pi - alpha)) + label_w / 2
             y_0 = label_y + radius * (math.sin(math.pi - alpha - beta) - math.sin(math.pi - alpha)) + label_h / 2
             
@@ -948,7 +939,7 @@ class Converter(object):
 
             return mask.reshape((height, width))
 
-        # Read Label Studio formatted JSON file
+        # Read Beewant formatted JSON file
         self._check_format(Format.MASK_TO_COCO)
         ensure_dir(output_dir)
         output_file = os.path.join(output_dir, 'result.json')

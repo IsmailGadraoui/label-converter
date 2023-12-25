@@ -22,7 +22,7 @@ def get_args():
 
     parser_export.add_argument(
         '-i', '--input', dest='input', required=True,
-        help='Path to Label Studio export file',
+        help='Path to Beewant export file',
         action=ExpandFullPath
     )
     parser_export.add_argument(

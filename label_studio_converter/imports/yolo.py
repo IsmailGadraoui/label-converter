@@ -14,12 +14,12 @@ def convert_yolo_to_ls(input_dir, out_file,
                        to_name='image', from_name='label', out_type="annotations",
                        image_root_url='/data/local-files/?d=', image_ext='.jpg'):
 
-    """ Convert YOLO labeling to Label Studio JSON
+    """ Convert YOLO labeling to Beewant JSON
 
     :param input_dir: directory with YOLO where images, labels, notes.json are located
-    :param out_file: output file with Label Studio JSON tasks
-    :param to_name: object name from Label Studio labeling config
-    :param from_name: control tag name from Label Studio labeling config
+    :param out_file: output file with Beewant JSON tasks
+    :param to_name: object name from Beewant labeling config
+    :param from_name: control tag name from Beewant labeling config
     :param out_type: annotation type - "annotations" or "predictions"
     :param image_root_url: root URL path where images will be hosted, e.g.: http://example.com/images
     :param image_ext: image extension to search: .jpg, .png
@@ -52,7 +52,7 @@ def convert_yolo_to_ls(input_dir, out_file,
             continue
 
         if not os.path.exists(image_file):
-            logger.info("Can't convert YOLO to Label Studio JSON without image source: %s", image_file)
+            logger.info("Can't convert YOLO to Beewant JSON without image source: %s", image_file)
             continue
 
         task = {
@@ -73,7 +73,7 @@ def convert_yolo_to_ls(input_dir, out_file,
         image_width, image_height = im.size
 
         with open(label_file) as file:
-            # convert all bounding boxes to Label Studio Results
+            # convert all bounding boxes to Beewant Results
             lines = file.readlines()
             for line in lines:
                 label_id, x, y, width, height = line.split()
@@ -102,12 +102,12 @@ def convert_yolo_to_ls(input_dir, out_file,
         tasks.append(task)
 
     if len(tasks) > 0:
-        logger.info('Saving Label Studio JSON to %s', out_file)
+        logger.info('Saving Beewant JSON to %s', out_file)
         with open(out_file, 'w') as out:
             json.dump(tasks, out)
 
         print('\n'
-              f'  1. Create a new project in Label Studio\n'
+              f'  1. Create a new project in Beewant\n'
               f'  2. Use Labeling Config from "{label_config_file}"\n'
               f'  3. Setup serving for images [e.g. you can use Local Storage (or others):\n'
               f'     https://labelstud.io/guide/storage.html#Local-storage]\n'
@@ -126,18 +126,18 @@ def add_parser(subparsers):
     )
     yolo.add_argument(
         '-o', '--output', dest='output',
-        help='output file with Label Studio JSON tasks',
+        help='output file with Beewant JSON tasks',
         default='output.json',
         action=ExpandFullPath
     )
     yolo.add_argument(
         '--to-name', dest='to_name',
-        help='object name from Label Studio labeling config',
+        help='object name from Beewant labeling config',
         default='image',
     )
     yolo.add_argument(
         '--from-name', dest='from_name',
-        help='control tag name from Label Studio labeling config',
+        help='control tag name from Beewant labeling config',
         default='label',
     )
     yolo.add_argument(

@@ -91,12 +91,12 @@ def convert_coco_to_ls(input_file, out_file,
                        use_super_categories=False,
                        point_width=1.0):
 
-    """ Convert COCO labeling to Label Studio JSON
+    """ Convert COCO labeling to Beewant JSON
 
     :param input_file: file with COCO json
-    :param out_file: output file with Label Studio JSON tasks
-    :param to_name: object name from Label Studio labeling config
-    :param from_name: control tag name from Label Studio labeling config
+    :param out_file: output file with Beewant JSON tasks
+    :param to_name: object name from Beewant labeling config
+    :param from_name: control tag name from Beewant labeling config
     :param out_type: annotation type - "annotations" or "predictions"
     :param image_root_url: root URL path where images will be hosted, e.g.: http://example.com/images
     :param use_super_categories: use super categories from categories if they are presented
@@ -180,15 +180,14 @@ def convert_coco_to_ls(input_file, out_file,
 
     if len(tasks) > 0:
         tasks = [tasks[key] for key in sorted(tasks.keys())]
-        logger.info('Saving Label Studio JSON to %s', out_file)
+        logger.info('Saving Beewant JSON to %s', out_file)
         with open(out_file, 'w') as out:
             json.dump(tasks, out)
 
         print('\n'
-              f'  1. Create a new project in Label Studio\n'
+              f'  1. Create a new project in Beewant\n'
               f'  2. Use Labeling Config from "{label_config_file}"\n'
               f'  3. Setup serving for images [e.g. you can use Local Storage (or others):\n'
-              f'     https://labelstud.io/guide/storage.html#Local-storage]\n'
               f'  4. Import "{out_file}" to the project\n')
     else:
         logger.error('No labels converted')
@@ -204,18 +203,18 @@ def add_parser(subparsers):
     )
     coco.add_argument(
         '-o', '--output', dest='output',
-        help='output file with Label Studio JSON tasks',
+        help='output file with Beewant JSON tasks',
         default='output.json',
         action=ExpandFullPath
     )
     coco.add_argument(
         '--to-name', dest='to_name',
-        help='object name from Label Studio labeling config',
+        help='object name from Beewant labeling config',
         default='image',
     )
     coco.add_argument(
         '--from-name', dest='from_name',
-        help='control tag name from Label Studio labeling config',
+        help='control tag name from Beewant labeling config',
         default='label',
     )
     coco.add_argument(

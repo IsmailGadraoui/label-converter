@@ -1,4 +1,4 @@
-# Label Studio Converter
+# Beewant Converter
 
 [Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](https://slack.labelstudio.heartex.com)
 
@@ -16,7 +16,7 @@
 
 ## Introduction
 
-Label Studio Format Converter helps you to encode labels into the format of your favorite machine learning library.
+Beewant Format Converter helps you to encode labels into the format of your favorite machine learning library.
 
 ## Examples
 
@@ -185,7 +185,7 @@ Getting output file `tmp/output.json`
   "info": {
     "year": 2019,
     "version": "1.0",
-    "contributor": "Label Studio"
+    "contributor": "Beewant"
   }
 }
 ```
@@ -222,7 +222,7 @@ Corresponding annotations could be found in `tmp/voc-annotations/*.xml`:
 </source>
 <owner>
 <flickrid>NULL</flickrid>
-<name>Label Studio</name>
+<name>Beewant</name>
 </owner>
 <size>
 <width>800</width>
@@ -285,10 +285,10 @@ optional arguments:
                         directory with YOLO where images, labels, notes.json
                         are located
   -o OUTPUT, --output OUTPUT
-                        output file with Label Studio JSON tasks
-  --to-name TO_NAME     object name from Label Studio labeling config
+                        output file with Beewant JSON tasks
+  --to-name TO_NAME     object name from Beewant labeling config
   --from-name FROM_NAME
-                        control tag name from Label Studio labeling config
+                        control tag name from Beewant labeling config
   --out-type OUT_TYPE   annotation type - "annotations" or "predictions"
   --image-root-url IMAGE_ROOT_URL
                         root URL path where images will be hosted, e.g.:

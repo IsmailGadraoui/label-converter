@@ -15,7 +15,7 @@ def test_image2annotation():
         model_version='v1', score=0.5
     )
 
-    # prepare Label Studio Task
+    # prepare Beewant Task
     task = {
         'data': {'image': 'https://labelstud.io/images/test.jpg'},
         'predictions': [
@@ -23,7 +23,7 @@ def test_image2annotation():
         ]
     }
 
-    """ You can import this `task.json` to the Label Studio project with this labeling config:
+    """ You can import this `task.json` to the Beewant project with this labeling config:
     
     <View>
       <Image name="image" value="$image" zoom="true"/>

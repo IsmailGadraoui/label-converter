@@ -1,4 +1,4 @@
-""" PathTrack BBoxes to Label Studio convert
+""" PathTrack BBoxes to Beewant convert
 https://www.trace.ethz.ch/publications/2017/pathtrack/index.html
 """
 import os
@@ -137,13 +137,13 @@ def create_config(from_name='box', to_name='video', source_value='video', target
 def convert_shot(input_url, label_file, info_file,
                  from_name='box', to_name='video', source_value='video',
                  target_fps=None, hop_keyframes=0):
-    """ Convert bounding boxes from PathTrack to Label Studio video format
+    """ Convert bounding boxes from PathTrack to Beewant video format
 
     :param input_url: video file
     :param label_file: text file with annotations line by line
     :param info_file: info.xml with frame rate and other useful info
-    :param from_name: control tag name from Label Studio labeling config
-    :param to_name: object name from Label Studio labeling config
+    :param from_name: control tag name from Beewant labeling config
+    :param to_name: object name from Beewant labeling config
     :param source_value: source name for Video tag, e.g. $video
     :param target_fps: keep video with this fps only
     :param hop_keyframes: how many keyframes to skip
@@ -160,7 +160,7 @@ def convert_shot(input_url, label_file, info_file,
     regions = {}
     keyframe_count = 0
 
-    # convert all bounding boxes to Label Studio Results
+    # convert all bounding boxes to Beewant Results
     for v in generator(label_file):
         idx = v.label_id
         if idx in regions:
@@ -191,12 +191,12 @@ def convert_shot(input_url, label_file, info_file,
 
 def convert_dataset(root_dir, root_url, from_name='box', to_name='video', source_value='video',
                     target_fps=None, hop_keyframes=0):
-    """ Convert PathTrack dataset to Label Studio video labeling format
+    """ Convert PathTrack dataset to Beewant video labeling format
 
     :param root_dir: root dir with video folders, e.g.: 'pathtrack/train' or 'pathtrack/test'
     :param root_url: where the dataset is served by http/https
-    :param to_name: object name from Label Studio labeling config
-    :param from_name: control tag name from Label Studio labeling config
+    :param to_name: object name from Beewant labeling config
+    :param from_name: control tag name from Beewant labeling config
     :param source_value: source name for Video tag, e.g. $video
     :param target_fps: keep video with this fps only
     :param hop_keyframes: how many keyframes to skip
@@ -226,7 +226,7 @@ def convert_dataset(root_dir, root_url, from_name='box', to_name='video', source
 
     fps_name = int(target_fps)
     path = os.path.join(root_dir, f'import-{fps_name}.json')
-    logger.info('Saving Label Studio JSON: %s', path)
+    logger.info('Saving Beewant JSON: %s', path)
     with open(path, 'w') as f:
         json.dump(tasks, f)
 

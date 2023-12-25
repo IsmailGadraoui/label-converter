@@ -17,7 +17,7 @@ setuptools.setup(
     version=label_studio_converter.__version__,
     author='Heartex',
     author_email="hello@heartex.ai",
-    description='Format converter add-on for Label Studio',
+    description='Format converter add-on for Beewant',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/heartexlabs/label-studio-converter',
